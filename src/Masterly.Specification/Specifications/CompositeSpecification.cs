@@ -1,4 +1,4 @@
-﻿namespace Masterly.Specifications
+﻿namespace Masterly.Specification
 {
     /// <summary>
     /// Represents the base class for composite specifications.

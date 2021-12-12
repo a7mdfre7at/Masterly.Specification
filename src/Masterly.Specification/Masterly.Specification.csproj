@@ -2,7 +2,36 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Ahmad Al-Freihat</Authors>
+    <Description>Specification Pattern is used to define named, reusable, combinable and testable filters for entities and other business objects.</Description>
+    <PackageProjectUrl>https://github.com/a7mdfre7at/Masterly.Specification</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/a7mdfre7at/Masterly.Specification</RepositoryUrl>
+    <PackageIcon>repo_image.png</PackageIcon>
+    <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
+    <PackageTags>Query;Filter;Spec;Specification;Repository;EF;EntityFramework;Reusable;Named;Combinable;Design;Pattern</PackageTags>
+    <PackageReleaseNotes>Initial relelase</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.nuget.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\repo_image.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="3.3.0" />

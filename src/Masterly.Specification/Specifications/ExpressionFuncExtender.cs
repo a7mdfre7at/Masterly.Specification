@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Masterly.Specifications
+namespace Masterly.Specification
 {
     /// <summary>
     /// Represents the extender for Expression[Func[T, bool]] type.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Masterly.Specifications
+namespace Masterly.Specification
 {
     /// <summary>
     /// Represents the base class for specifications.

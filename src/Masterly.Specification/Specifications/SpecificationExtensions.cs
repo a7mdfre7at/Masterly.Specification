@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using JetBrains.Annotations;
 
-namespace Masterly.Specifications
+namespace Masterly.Specification
 {
     public static class SpecificationExtensions
     {

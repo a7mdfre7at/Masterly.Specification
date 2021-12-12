@@ -1,4 +1,4 @@
-﻿namespace Masterly.Specifications
+﻿namespace Masterly.Specification
 {
     /// <summary>
     /// Represents that the implemented classes are composite specifications.
