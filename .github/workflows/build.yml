@@ -33,7 +33,6 @@ jobs:
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        VERSION: "v1.0.0"
       with:
         tag_name: v1.0.0
         release_name: Release v1.0.0

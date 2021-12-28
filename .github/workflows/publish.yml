@@ -42,5 +42,5 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
       - run: |
-            echo "This workflow has been canceled because of build failed" 
+            echo "This workflow has been canceled because of build or test failed" 
             exit 1
