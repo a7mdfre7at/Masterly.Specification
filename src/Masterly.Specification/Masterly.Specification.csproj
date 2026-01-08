@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/a7mdfre7at/Masterly.Specification</PackageProjectUrl>
     <RepositoryUrl>https://github.com/a7mdfre7at/Masterly.Specification</RepositoryUrl>
     <PackageIcon>repo_image.png</PackageIcon>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <PackageTags>Query;Filter;Spec;Specification;Repository;EF;EntityFramework;Reusable;Named;Combinable;Design;Pattern</PackageTags>
     <PackageReleaseNotes>Initial relelase</PackageReleaseNotes>
