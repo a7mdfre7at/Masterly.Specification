@@ -69,5 +69,70 @@ namespace Masterly.Specification
 
             return new NotSpecification<T>(specification);
         }
+
+        /// <summary>
+        /// Combines two specifications with XOR (exclusive OR).
+        /// Exactly one of the specifications must be satisfied.
+        /// </summary>
+        public static ISpecification<T> Xor<T>([NotNull] this ISpecification<T> specification,
+            [NotNull] ISpecification<T> other)
+        {
+            Guard.Against.Null(specification, nameof(specification));
+            Guard.Against.Null(other, nameof(other));
+
+            return new XorSpecification<T>(specification, other);
+        }
+
+        /// <summary>
+        /// Creates a logical implication (A implies B).
+        /// If the current specification is satisfied, the other must also be satisfied.
+        /// </summary>
+        public static ISpecification<T> Implies<T>([NotNull] this ISpecification<T> specification,
+            [NotNull] ISpecification<T> other)
+        {
+            Guard.Against.Null(specification, nameof(specification));
+            Guard.Against.Null(other, nameof(other));
+
+            return new ImpliesSpecification<T>(specification, other);
+        }
+
+        /// <summary>
+        /// Creates a bi-conditional (A if and only if B).
+        /// Both specifications must have the same result (both true or both false).
+        /// </summary>
+        public static ISpecification<T> Iff<T>([NotNull] this ISpecification<T> specification,
+            [NotNull] ISpecification<T> other)
+        {
+            Guard.Against.Null(specification, nameof(specification));
+            Guard.Against.Null(other, nameof(other));
+
+            return new IffSpecification<T>(specification, other);
+        }
+
+        /// <summary>
+        /// Creates a NAND specification (NOT AND).
+        /// Returns false only when both specifications are satisfied.
+        /// </summary>
+        public static ISpecification<T> Nand<T>([NotNull] this ISpecification<T> specification,
+            [NotNull] ISpecification<T> other)
+        {
+            Guard.Against.Null(specification, nameof(specification));
+            Guard.Against.Null(other, nameof(other));
+
+            return new NandSpecification<T>(specification, other);
+        }
+
+        /// <summary>
+        /// Creates a NOR specification (NOT OR).
+        /// Returns true only when both specifications are not satisfied.
+        /// </summary>
+        public static ISpecification<T> Nor<T>([NotNull] this ISpecification<T> specification,
+            [NotNull] ISpecification<T> other)
+        {
+            Guard.Against.Null(specification, nameof(specification));
+            Guard.Against.Null(other, nameof(other));
+
+            return new NorSpecification<T>(specification, other);
+        }
     }
 }
