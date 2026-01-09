@@ -16,13 +16,13 @@ namespace Masterly.Specification
 
         public override Expression<Func<T, bool>> ToExpression()
         {
-            var leftExpr = Left.ToExpression();
-            var rightExpr = Right.ToExpression();
+            Expression<Func<T, bool>> leftExpr = Left.ToExpression();
+            Expression<Func<T, bool>> rightExpr = Right.ToExpression();
 
             // IFF: (A && B) || (!A && !B)
-            var notLeft = Expression.Lambda<Func<T, bool>>(
+            Expression<Func<T, bool>> notLeft = Expression.Lambda<Func<T, bool>>(
                 Expression.Not(leftExpr.Body), leftExpr.Parameters);
-            var notRight = Expression.Lambda<Func<T, bool>>(
+            Expression<Func<T, bool>> notRight = Expression.Lambda<Func<T, bool>>(
                 Expression.Not(rightExpr.Body), rightExpr.Parameters);
 
             return leftExpr.And(rightExpr).Or(notLeft.And(notRight));

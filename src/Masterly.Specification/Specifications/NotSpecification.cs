@@ -26,7 +26,7 @@ namespace Masterly.Specification
         /// <returns>The LINQ expression.</returns>
         public override Expression<Func<T, bool>> ToExpression()
         {
-            var expression = _specification.ToExpression();
+            Expression<Func<T, bool>> expression = _specification.ToExpression();
             return Expression.Lambda<Func<T, bool>>(
                 Expression.Not(expression.Body),
                 expression.Parameters

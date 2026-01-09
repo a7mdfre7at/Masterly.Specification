@@ -26,11 +26,11 @@ namespace Masterly.Specification
         /// </summary>
         public static string GetDetailedResult<T>(this ISpecification<T> specification, T obj)
         {
-            var result = specification.Evaluate(obj);
-            var lines = new System.Text.StringBuilder();
+            EvaluationResult result = specification.Evaluate(obj);
+            System.Text.StringBuilder lines = new System.Text.StringBuilder();
             lines.AppendLine($"Result: {result.Summary}");
             lines.AppendLine("Details:");
-            foreach (var detail in result.Details)
+            foreach (EvaluationDetail detail in result.Details)
             {
                 lines.AppendLine($"  - {detail}");
             }

@@ -96,8 +96,8 @@ namespace Masterly.Specification
             this ISpecification<T> first,
             params ISpecification<T>[] others)
         {
-            var result = first;
-            foreach (var spec in others)
+            ISpecification<T> result = first;
+            foreach (ISpecification<T> spec in others)
             {
                 result = result.And(spec);
             }

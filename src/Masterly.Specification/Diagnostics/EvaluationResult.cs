@@ -49,7 +49,7 @@ namespace Masterly.Specification
 
         public override string ToString()
         {
-            var status = Passed ? "PASSED" : "FAILED";
+            string status = Passed ? "PASSED" : "FAILED";
             if (ActualValue != null && !Passed)
                 return $"{Condition}: {status} (actual: {ActualValue})";
             return $"{Condition}: {status}";

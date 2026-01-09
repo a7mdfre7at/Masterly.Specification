@@ -45,10 +45,10 @@ namespace Masterly.Specification
         /// </summary>
         public static ISpecification<T> EqualsIgnoreCase<T>(this PropertySpecification<T, string> property, string value)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var toLower = Expression.Call(propInfo.PropertyAccess, ToLowerMethod);
-            var body = Expression.Equal(toLower, Expression.Constant(value?.ToLower()));
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MethodCallExpression toLower = Expression.Call(propInfo.PropertyAccess, ToLowerMethod);
+            BinaryExpression body = Expression.Equal(toLower, Expression.Constant(value?.ToLower()));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -57,10 +57,10 @@ namespace Masterly.Specification
         /// </summary>
         public static ISpecification<T> ContainsIgnoreCase<T>(this PropertySpecification<T, string> property, string value)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var toLower = Expression.Call(propInfo.PropertyAccess, ToLowerMethod);
-            var body = Expression.Call(toLower, ContainsMethod, Expression.Constant(value?.ToLower()));
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MethodCallExpression toLower = Expression.Call(propInfo.PropertyAccess, ToLowerMethod);
+            MethodCallExpression body = Expression.Call(toLower, ContainsMethod, Expression.Constant(value?.ToLower()));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -69,9 +69,9 @@ namespace Masterly.Specification
         /// </summary>
         public static ISpecification<T> IsNullOrEmpty<T>(this PropertySpecification<T, string> property)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var body = Expression.Call(IsNullOrEmptyMethod, propInfo.PropertyAccess);
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MethodCallExpression body = Expression.Call(IsNullOrEmptyMethod, propInfo.PropertyAccess);
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -88,9 +88,9 @@ namespace Masterly.Specification
         /// </summary>
         public static ISpecification<T> IsNullOrWhiteSpace<T>(this PropertySpecification<T, string> property)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var body = Expression.Call(IsNullOrWhiteSpaceMethod, propInfo.PropertyAccess);
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MethodCallExpression body = Expression.Call(IsNullOrWhiteSpaceMethod, propInfo.PropertyAccess);
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -107,10 +107,10 @@ namespace Masterly.Specification
         /// </summary>
         public static ISpecification<T> HasLength<T>(this PropertySpecification<T, string> property, int length)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var lengthProperty = Expression.Property(propInfo.PropertyAccess, "Length");
-            var body = Expression.Equal(lengthProperty, Expression.Constant(length));
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MemberExpression lengthProperty = Expression.Property(propInfo.PropertyAccess, "Length");
+            BinaryExpression body = Expression.Equal(lengthProperty, Expression.Constant(length));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -119,30 +119,30 @@ namespace Masterly.Specification
         /// </summary>
         public static ISpecification<T> HasLengthBetween<T>(this PropertySpecification<T, string> property, int min, int max)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var lengthProperty = Expression.Property(propInfo.PropertyAccess, "Length");
-            var minCheck = Expression.GreaterThanOrEqual(lengthProperty, Expression.Constant(min));
-            var maxCheck = Expression.LessThanOrEqual(lengthProperty, Expression.Constant(max));
-            var body = Expression.AndAlso(minCheck, maxCheck);
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MemberExpression lengthProperty = Expression.Property(propInfo.PropertyAccess, "Length");
+            BinaryExpression minCheck = Expression.GreaterThanOrEqual(lengthProperty, Expression.Constant(min));
+            BinaryExpression maxCheck = Expression.LessThanOrEqual(lengthProperty, Expression.Constant(max));
+            BinaryExpression body = Expression.AndAlso(minCheck, maxCheck);
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
         private static ISpecification<T> CreateStringMethodSpec<T>(
             PropertySpecification<T, string> property, MethodInfo method, string value)
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var body = Expression.Call(propInfo.PropertyAccess, method, Expression.Constant(value));
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            MethodCallExpression body = Expression.Call(propInfo.PropertyAccess, method, Expression.Constant(value));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
         private static (ParameterExpression Parameter, Expression PropertyAccess) GetPropertyInfo<T>(
             PropertySpecification<T, string> property)
         {
-            var selectorField = typeof(PropertySpecification<T, string>)
+            FieldInfo selectorField = typeof(PropertySpecification<T, string>)
                 .GetField("_propertySelector", BindingFlags.NonPublic | BindingFlags.Instance);
-            var selector = (Expression<Func<T, string>>)selectorField.GetValue(property);
+            Expression<Func<T, string>> selector = (Expression<Func<T, string>>)selectorField.GetValue(property);
             return (selector.Parameters[0], selector.Body);
         }
     }

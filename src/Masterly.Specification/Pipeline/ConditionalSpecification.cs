@@ -31,20 +31,20 @@ namespace Masterly.Specification
         public override Expression<Func<T, bool>> ToExpression()
         {
             // Build conditional expression: condition ? whenTrue : whenFalse
-            var param = Expression.Parameter(typeof(T), "x");
+            ParameterExpression param = Expression.Parameter(typeof(T), "x");
 
             // We need to inline the condition as an expression
             // For complex conditions, fall back to compiled delegate
-            var whenTrueExpr = _whenTrue.ToExpression();
-            var whenFalseExpr = _whenFalse.ToExpression();
+            Expression<Func<T, bool>> whenTrueExpr = _whenTrue.ToExpression();
+            Expression<Func<T, bool>> whenFalseExpr = _whenFalse.ToExpression();
 
             // Rebind parameters
-            var trueBody = new ParameterReplacer(whenTrueExpr.Parameters[0], param).Visit(whenTrueExpr.Body);
-            var falseBody = new ParameterReplacer(whenFalseExpr.Parameters[0], param).Visit(whenFalseExpr.Body);
+            Expression trueBody = new ParameterReplacer(whenTrueExpr.Parameters[0], param).Visit(whenTrueExpr.Body);
+            Expression falseBody = new ParameterReplacer(whenFalseExpr.Parameters[0], param).Visit(whenFalseExpr.Body);
 
             // For the condition, we invoke the compiled delegate
-            var conditionInvoke = Expression.Invoke(Expression.Constant(_condition), param);
-            var conditional = Expression.Condition(conditionInvoke, trueBody, falseBody);
+            InvocationExpression conditionInvoke = Expression.Invoke(Expression.Constant(_condition), param);
+            ConditionalExpression conditional = Expression.Condition(conditionInvoke, trueBody, falseBody);
 
             return Expression.Lambda<Func<T, bool>>(conditional, param);
         }
@@ -88,7 +88,7 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> Otherwise(ISpecification<T> specification)
         {
-            var conditional = new ConditionalSpecification<T>(_condition, _whenTrue, specification);
+            ConditionalSpecification<T> conditional = new ConditionalSpecification<T>(_condition, _whenTrue, specification);
             return _baseSpec == null ? conditional : _baseSpec.And(conditional);
         }
 

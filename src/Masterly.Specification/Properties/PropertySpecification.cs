@@ -22,8 +22,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> EqualTo(TProperty value)
         {
-            var param = _propertySelector.Parameters[0];
-            var body = Expression.Equal(_propertySelector.Body, Expression.Constant(value, typeof(TProperty)));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            BinaryExpression body = Expression.Equal(_propertySelector.Body, Expression.Constant(value, typeof(TProperty)));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -32,8 +32,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> NotEqualTo(TProperty value)
         {
-            var param = _propertySelector.Parameters[0];
-            var body = Expression.NotEqual(_propertySelector.Body, Expression.Constant(value, typeof(TProperty)));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            BinaryExpression body = Expression.NotEqual(_propertySelector.Body, Expression.Constant(value, typeof(TProperty)));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -42,8 +42,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> IsNull()
         {
-            var param = _propertySelector.Parameters[0];
-            var body = Expression.Equal(_propertySelector.Body, Expression.Constant(null, typeof(TProperty)));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            BinaryExpression body = Expression.Equal(_propertySelector.Body, Expression.Constant(null, typeof(TProperty)));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -52,8 +52,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> IsNotNull()
         {
-            var param = _propertySelector.Parameters[0];
-            var body = Expression.NotEqual(_propertySelector.Body, Expression.Constant(null, typeof(TProperty)));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            BinaryExpression body = Expression.NotEqual(_propertySelector.Body, Expression.Constant(null, typeof(TProperty)));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -67,13 +67,13 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> In(IEnumerable<TProperty> values)
         {
-            var valuesList = values.ToList();
-            var param = _propertySelector.Parameters[0];
-            var containsMethod = typeof(Enumerable).GetMethods()
+            List<TProperty> valuesList = values.ToList();
+            ParameterExpression param = _propertySelector.Parameters[0];
+            System.Reflection.MethodInfo containsMethod = typeof(Enumerable).GetMethods()
                 .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
                 .MakeGenericMethod(typeof(TProperty));
 
-            var body = Expression.Call(containsMethod, Expression.Constant(valuesList), _propertySelector.Body);
+            MethodCallExpression body = Expression.Call(containsMethod, Expression.Constant(valuesList), _propertySelector.Body);
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -92,9 +92,9 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> Matches(Expression<Func<TProperty, bool>> predicate)
         {
-            var param = _propertySelector.Parameters[0];
-            var propertyAccess = _propertySelector.Body;
-            var predicateBody = new ParameterReplacer(predicate.Parameters[0], propertyAccess).Visit(predicate.Body);
+            ParameterExpression param = _propertySelector.Parameters[0];
+            Expression propertyAccess = _propertySelector.Body;
+            Expression predicateBody = new ParameterReplacer(predicate.Parameters[0], propertyAccess).Visit(predicate.Body);
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(predicateBody, param));
         }
 

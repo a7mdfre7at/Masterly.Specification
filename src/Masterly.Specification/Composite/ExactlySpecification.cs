@@ -39,7 +39,7 @@ namespace Masterly.Specification
         {
             if (_compiled == null)
             {
-                var compiledSpecs = _specifications.Select(s => s.ToExpression().Compile()).ToList();
+                List<Func<T, bool>> compiledSpecs = _specifications.Select(s => s.ToExpression().Compile()).ToList();
                 _compiled = o => compiledSpecs.Count(f => f(o)) == _count;
             }
             return _compiled(obj);
@@ -49,9 +49,9 @@ namespace Masterly.Specification
         {
             // For expression trees, we need to build the counting logic
             // This creates a complex expression that counts matching specifications
-            var param = Expression.Parameter(typeof(T), "x");
-            var countExpr = BuildCountExpression(param);
-            var comparison = Expression.Equal(countExpr, Expression.Constant(_count));
+            ParameterExpression param = Expression.Parameter(typeof(T), "x");
+            Expression countExpr = BuildCountExpression(param);
+            BinaryExpression comparison = Expression.Equal(countExpr, Expression.Constant(_count));
 
             return Expression.Lambda<Func<T, bool>>(comparison, param);
         }
@@ -60,11 +60,11 @@ namespace Masterly.Specification
         {
             Expression sum = Expression.Constant(0);
 
-            foreach (var spec in _specifications)
+            foreach (ISpecification<T> spec in _specifications)
             {
-                var specExpr = spec.ToExpression();
-                var body = new ParameterReplacer(specExpr.Parameters[0], param).Visit(specExpr.Body);
-                var conditional = Expression.Condition(body, Expression.Constant(1), Expression.Constant(0));
+                Expression<Func<T, bool>> specExpr = spec.ToExpression();
+                Expression body = new ParameterReplacer(specExpr.Parameters[0], param).Visit(specExpr.Body);
+                ConditionalExpression conditional = Expression.Condition(body, Expression.Constant(1), Expression.Constant(0));
                 sum = Expression.Add(sum, conditional);
             }
 

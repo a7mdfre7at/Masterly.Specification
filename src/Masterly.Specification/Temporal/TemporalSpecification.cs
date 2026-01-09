@@ -60,7 +60,7 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> Within(TimeSpan timeSpan)
         {
-            var now = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
             return Between(now.Subtract(timeSpan), now.Add(timeSpan));
         }
 
@@ -85,7 +85,7 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> Today()
         {
-            var today = DateTime.Today;
+            DateTime today = DateTime.Today;
             return Between(today, today.AddDays(1).AddTicks(-1));
         }
 
@@ -94,8 +94,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> InYear(int year)
         {
-            var start = new DateTime(year, 1, 1);
-            var end = new DateTime(year, 12, 31, 23, 59, 59, 999);
+            DateTime start = new DateTime(year, 1, 1);
+            DateTime end = new DateTime(year, 12, 31, 23, 59, 59, 999);
             return Between(start, end);
         }
 
@@ -104,8 +104,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> InMonth(int year, int month)
         {
-            var start = new DateTime(year, month, 1);
-            var end = start.AddMonths(1).AddTicks(-1);
+            DateTime start = new DateTime(year, month, 1);
+            DateTime end = start.AddMonths(1).AddTicks(-1);
             return Between(start, end);
         }
 
@@ -114,9 +114,9 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> OnDayOfWeek(DayOfWeek dayOfWeek)
         {
-            var param = _propertySelector.Parameters[0];
-            var dayOfWeekProperty = Expression.Property(_propertySelector.Body, "DayOfWeek");
-            var body = Expression.Equal(dayOfWeekProperty, Expression.Constant(dayOfWeek));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            MemberExpression dayOfWeekProperty = Expression.Property(_propertySelector.Body, "DayOfWeek");
+            BinaryExpression body = Expression.Equal(dayOfWeekProperty, Expression.Constant(dayOfWeek));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
@@ -149,7 +149,7 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> WithinNextDays(int days)
         {
-            var now = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
             return After(now).And(Before(now.AddDays(days)));
         }
 
@@ -158,19 +158,19 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> TimeBetween(TimeSpan start, TimeSpan end)
         {
-            var param = _propertySelector.Parameters[0];
-            var timeOfDayProperty = Expression.Property(_propertySelector.Body, "TimeOfDay");
-            var startCheck = Expression.GreaterThanOrEqual(timeOfDayProperty, Expression.Constant(start));
-            var endCheck = Expression.LessThanOrEqual(timeOfDayProperty, Expression.Constant(end));
-            var body = Expression.AndAlso(startCheck, endCheck);
+            ParameterExpression param = _propertySelector.Parameters[0];
+            MemberExpression timeOfDayProperty = Expression.Property(_propertySelector.Body, "TimeOfDay");
+            BinaryExpression startCheck = Expression.GreaterThanOrEqual(timeOfDayProperty, Expression.Constant(start));
+            BinaryExpression endCheck = Expression.LessThanOrEqual(timeOfDayProperty, Expression.Constant(end));
+            BinaryExpression body = Expression.AndAlso(startCheck, endCheck);
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
         private ISpecification<T> CreateComparison(
             Func<Expression, Expression, BinaryExpression> comparison, DateTime value)
         {
-            var param = _propertySelector.Parameters[0];
-            var body = comparison(_propertySelector.Body, Expression.Constant(value));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            BinaryExpression body = comparison(_propertySelector.Body, Expression.Constant(value));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
     }
@@ -192,8 +192,8 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> HasValue()
         {
-            var param = _propertySelector.Parameters[0];
-            var hasValueProperty = Expression.Property(_propertySelector.Body, "HasValue");
+            ParameterExpression param = _propertySelector.Parameters[0];
+            MemberExpression hasValueProperty = Expression.Property(_propertySelector.Body, "HasValue");
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(hasValueProperty, param));
         }
 
@@ -210,10 +210,10 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> HasValueAnd(Func<TemporalSpecification<T>, ISpecification<T>> configure)
         {
-            var param = _propertySelector.Parameters[0];
-            var valueProperty = Expression.Property(_propertySelector.Body, "Value");
-            var innerSelector = Expression.Lambda<Func<T, DateTime>>(valueProperty, param);
-            var innerSpec = configure(new TemporalSpecification<T>(innerSelector));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            MemberExpression valueProperty = Expression.Property(_propertySelector.Body, "Value");
+            Expression<Func<T, DateTime>> innerSelector = Expression.Lambda<Func<T, DateTime>>(valueProperty, param);
+            ISpecification<T> innerSpec = configure(new TemporalSpecification<T>(innerSelector));
             return HasValue().And(innerSpec);
         }
     }
@@ -256,16 +256,16 @@ namespace Masterly.Specification
         /// </summary>
         public ISpecification<T> Between(DateTimeOffset start, DateTimeOffset end)
         {
-            var afterStart = CreateComparison(Expression.GreaterThanOrEqual, start);
-            var beforeEnd = CreateComparison(Expression.LessThanOrEqual, end);
+            ISpecification<T> afterStart = CreateComparison(Expression.GreaterThanOrEqual, start);
+            ISpecification<T> beforeEnd = CreateComparison(Expression.LessThanOrEqual, end);
             return afterStart.And(beforeEnd);
         }
 
         private ISpecification<T> CreateComparison(
             Func<Expression, Expression, BinaryExpression> comparison, DateTimeOffset value)
         {
-            var param = _propertySelector.Parameters[0];
-            var body = comparison(_propertySelector.Body, Expression.Constant(value));
+            ParameterExpression param = _propertySelector.Parameters[0];
+            BinaryExpression body = comparison(_propertySelector.Body, Expression.Constant(value));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
     }

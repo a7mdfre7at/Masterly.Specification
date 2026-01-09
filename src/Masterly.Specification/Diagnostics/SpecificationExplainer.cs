@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Masterly.Specification
 {
@@ -16,7 +15,7 @@ namespace Masterly.Specification
         /// </summary>
         public static string Explain<T>(ISpecification<T> specification)
         {
-            var expression = specification.ToExpression();
+            Expression<Func<T, bool>> expression = specification.ToExpression();
             return ExplainExpression(expression.Body);
         }
 
@@ -25,9 +24,9 @@ namespace Masterly.Specification
         /// </summary>
         public static EvaluationResult Evaluate<T>(ISpecification<T> specification, T obj)
         {
-            var expression = specification.ToExpression();
-            var details = new List<EvaluationDetail>();
-            var result = EvaluateExpression(expression.Body, expression.Parameters[0], obj, details);
+            Expression<Func<T, bool>> expression = specification.ToExpression();
+            List<EvaluationDetail> details = new List<EvaluationDetail>();
+            bool result = EvaluateExpression(expression.Body, expression.Parameters[0], obj, details);
             return new EvaluationResult(result, details);
         }
 
@@ -48,9 +47,9 @@ namespace Masterly.Specification
 
         private static string ExplainBinary(BinaryExpression binary)
         {
-            var left = ExplainExpression(binary.Left);
-            var right = ExplainExpression(binary.Right);
-            var op = binary.NodeType switch
+            string left = ExplainExpression(binary.Left);
+            string right = ExplainExpression(binary.Right);
+            string op = binary.NodeType switch
             {
                 ExpressionType.AndAlso => "AND",
                 ExpressionType.OrElse => "OR",
@@ -72,7 +71,7 @@ namespace Masterly.Specification
 
         private static string ExplainUnary(UnaryExpression unary)
         {
-            var operand = ExplainExpression(unary.Operand);
+            string operand = ExplainExpression(unary.Operand);
             return unary.NodeType switch
             {
                 ExpressionType.Not => $"NOT ({operand})",
@@ -83,16 +82,16 @@ namespace Masterly.Specification
 
         private static string ExplainMethodCall(MethodCallExpression methodCall)
         {
-            var methodName = methodCall.Method.Name;
+            string methodName = methodCall.Method.Name;
             if (methodCall.Object != null)
             {
-                var obj = ExplainExpression(methodCall.Object);
-                var args = string.Join(", ", methodCall.Arguments.Select(ExplainExpression));
+                string obj = ExplainExpression(methodCall.Object);
+                string args = string.Join(", ", methodCall.Arguments.Select(ExplainExpression));
                 return string.IsNullOrEmpty(args) ? $"{obj}.{methodName}()" : $"{obj}.{methodName}({args})";
             }
             else
             {
-                var args = string.Join(", ", methodCall.Arguments.Select(ExplainExpression));
+                string args = string.Join(", ", methodCall.Arguments.Select(ExplainExpression));
                 return $"{methodName}({args})";
             }
         }
@@ -110,9 +109,9 @@ namespace Masterly.Specification
 
         private static string ExplainConditional(ConditionalExpression conditional)
         {
-            var test = ExplainExpression(conditional.Test);
-            var ifTrue = ExplainExpression(conditional.IfTrue);
-            var ifFalse = ExplainExpression(conditional.IfFalse);
+            string test = ExplainExpression(conditional.Test);
+            string ifTrue = ExplainExpression(conditional.IfTrue);
+            string ifFalse = ExplainExpression(conditional.IfFalse);
             return $"IF ({test}) THEN {ifTrue} ELSE {ifFalse}";
         }
 
@@ -122,24 +121,24 @@ namespace Masterly.Specification
             switch (expression)
             {
                 case BinaryExpression binary when binary.NodeType == ExpressionType.AndAlso:
-                    var leftResult = EvaluateExpression(binary.Left, param, obj, details);
-                    var rightResult = EvaluateExpression(binary.Right, param, obj, details);
-                    return leftResult && rightResult;
+                    bool leftResultAnd = EvaluateExpression(binary.Left, param, obj, details);
+                    bool rightResultAnd = EvaluateExpression(binary.Right, param, obj, details);
+                    return leftResultAnd && rightResultAnd;
 
                 case BinaryExpression binary when binary.NodeType == ExpressionType.OrElse:
-                    leftResult = EvaluateExpression(binary.Left, param, obj, details);
-                    rightResult = EvaluateExpression(binary.Right, param, obj, details);
-                    return leftResult || rightResult;
+                    bool leftResultOr = EvaluateExpression(binary.Left, param, obj, details);
+                    bool rightResultOr = EvaluateExpression(binary.Right, param, obj, details);
+                    return leftResultOr || rightResultOr;
 
                 case UnaryExpression unary when unary.NodeType == ExpressionType.Not:
-                    var innerResult = EvaluateExpression(unary.Operand, param, obj, details);
+                    bool innerResult = EvaluateExpression(unary.Operand, param, obj, details);
                     return !innerResult;
 
                 default:
-                    var lambda = Expression.Lambda<Func<T, bool>>(expression, param);
-                    var compiled = lambda.Compile();
-                    var result = compiled(obj);
-                    var explanation = ExplainExpression(expression);
+                    Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(expression, param);
+                    Func<T, bool> compiled = lambda.Compile();
+                    bool result = compiled(obj);
+                    string explanation = ExplainExpression(expression);
                     details.Add(new EvaluationDetail(explanation, result));
                     return result;
             }

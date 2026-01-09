@@ -15,7 +15,7 @@ namespace Masterly.Specification
 
         public override Expression<Func<T, bool>> ToExpression()
         {
-            var combined = Left.ToExpression().Or(Right.ToExpression());
+            Expression<Func<T, bool>> combined = Left.ToExpression().Or(Right.ToExpression());
 
             return Expression.Lambda<Func<T, bool>>(
                 Expression.Not(combined.Body), combined.Parameters);

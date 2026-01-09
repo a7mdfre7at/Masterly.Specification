@@ -25,10 +25,10 @@ namespace Masterly.Specification
         /// <returns>The LINQ expression.</returns>
         public override Expression<Func<T, bool>> ToExpression()
         {
-            var rightExpression = Right.ToExpression();
+            Expression<Func<T, bool>> rightExpression = Right.ToExpression();
 
             UnaryExpression bodyNot = Expression.Not(rightExpression.Body);
-            var bodyNotExpression = Expression.Lambda<Func<T, bool>>(bodyNot, rightExpression.Parameters);
+            Expression<Func<T, bool>> bodyNotExpression = Expression.Lambda<Func<T, bool>>(bodyNot, rightExpression.Parameters);
 
             return Left.ToExpression().And(bodyNotExpression);
         }

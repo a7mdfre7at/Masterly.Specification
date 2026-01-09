@@ -84,18 +84,18 @@ namespace Masterly.Specification
             Func<Expression, Expression, BinaryExpression> comparison)
             where TProperty : IComparable<TProperty>
         {
-            var propInfo = GetPropertyInfo(property);
-            var param = propInfo.Parameter;
-            var body = comparison(propInfo.PropertyAccess, Expression.Constant(value, typeof(TProperty)));
+            (ParameterExpression Parameter, Expression PropertyAccess) propInfo = GetPropertyInfo(property);
+            ParameterExpression param = propInfo.Parameter;
+            BinaryExpression body = comparison(propInfo.PropertyAccess, Expression.Constant(value, typeof(TProperty)));
             return new ExpressionSpecification<T>(Expression.Lambda<Func<T, bool>>(body, param));
         }
 
         private static (ParameterExpression Parameter, Expression PropertyAccess) GetPropertyInfo<T, TProperty>(
             PropertySpecification<T, TProperty> property)
         {
-            var selectorField = typeof(PropertySpecification<T, TProperty>)
+            System.Reflection.FieldInfo selectorField = typeof(PropertySpecification<T, TProperty>)
                 .GetField("_propertySelector", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var selector = (Expression<Func<T, TProperty>>)selectorField.GetValue(property);
+            Expression<Func<T, TProperty>> selector = (Expression<Func<T, TProperty>>)selectorField.GetValue(property);
             return (selector.Parameters[0], selector.Body);
         }
     }

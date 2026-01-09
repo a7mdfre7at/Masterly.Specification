@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Masterly.Specification
@@ -129,9 +128,9 @@ namespace Masterly.Specification
         /// </summary>
         public SpecificationBuilder<T> Group(Func<SpecificationBuilder<T>, SpecificationBuilder<T>> groupBuilder)
         {
-            var innerBuilder = new SpecificationBuilder<T>();
-            var result = groupBuilder(innerBuilder);
-            var innerSpec = result.Build();
+            SpecificationBuilder<T> innerBuilder = new SpecificationBuilder<T>();
+            SpecificationBuilder<T> result = groupBuilder(innerBuilder);
+            ISpecification<T> innerSpec = result.Build();
 
             if (_specification == null)
                 _specification = innerSpec;
@@ -147,8 +146,8 @@ namespace Masterly.Specification
         public SpecificationBuilder<T> OrGroup(Func<SpecificationBuilder<T>, SpecificationBuilder<T>> groupBuilder)
         {
             EnsureStarted();
-            var innerBuilder = new SpecificationBuilder<T>();
-            var result = groupBuilder(innerBuilder);
+            SpecificationBuilder<T> innerBuilder = new SpecificationBuilder<T>();
+            SpecificationBuilder<T> result = groupBuilder(innerBuilder);
             _specification = _specification.Or(result.Build());
             return this;
         }

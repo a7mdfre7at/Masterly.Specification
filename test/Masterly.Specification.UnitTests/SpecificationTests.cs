@@ -11,16 +11,16 @@ public class SpecificationTests
     {
         _customers = new List<Customer>
         {
-            new Customer("John", 17, 47000, "England"),
-            new Customer("Tuana", 2, 500, "Turkey"),
-            new Customer("Martin", 43, 16000, "USA"),
-            new Customer("Lee", 32, 24502, "China"),
-            new Customer("Douglas", 42, 42000, "England"),
-            new Customer("Abelard", 14, 2332, "German"),
-            new Customer("Neo", 16, 120000, "USA"),
-            new Customer("Daan", 39, 6000, "Netherlands"),
-            new Customer("Alessandro", 22, 8271, "Italy"),
-            new Customer("Noah", 33, 82192, "Belgium")
+            new("John", 17, 47000, "England"),
+            new("Tuana", 2, 500, "Turkey"),
+            new("Martin", 43, 16000, "USA"),
+            new("Lee", 32, 24502, "China"),
+            new("Douglas", 42, 42000, "England"),
+            new("Abelard", 14, 2332, "German"),
+            new("Neo", 16, 120000, "USA"),
+            new("Daan", 39, 6000, "Netherlands"),
+            new("Alessandro", 22, 8271, "Italy"),
+            new("Noah", 33, 82192, "Belgium")
         }.AsQueryable();
     }
 

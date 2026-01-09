@@ -30,7 +30,7 @@ namespace Masterly.Specification
 
         public override Expression<Func<T, bool>> ToExpression()
         {
-            var result = _specifications[0].ToExpression();
+            Expression<Func<T, bool>> result = _specifications[0].ToExpression();
 
             for (int i = 1; i < _specifications.Count; i++)
             {
