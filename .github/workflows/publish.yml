@@ -43,6 +43,19 @@ jobs:
           NUGET_KEY: ${{ secrets.NUGET_API_KEY }}
           INCLUDE_SYMBOLS: false
 
+      - name: Create GitHub Release
+        if: steps.publish_nuget.outputs.VERSION != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release v${{ steps.publish_nuget.outputs.VERSION }}
+          tag_name: v${{ steps.publish_nuget.outputs.VERSION }}
+          body_path: CHANGELOG.md
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(steps.publish_nuget.outputs.VERSION, '-alpha') || contains(steps.publish_nuget.outputs.VERSION, '-beta') || contains(steps.publish_nuget.outputs.VERSION, '-rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   on-failure:
     name: Build Failed
     runs-on: ubuntu-latest
